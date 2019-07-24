@@ -2,8 +2,8 @@ from __future__ import print_function
 import time
 import torch.optim as optim
 import codecs
-# from model.stack_lstm import *
-from model.batch_stack_lstm import *
+from model.stack_lstm import *
+# from model.batch_stack_lstm import *
 import model.utils as utils
 import model.evaluate as evaluate
 

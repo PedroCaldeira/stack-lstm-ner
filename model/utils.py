@@ -44,7 +44,7 @@ def variable(tensor, gpu):
 
 
 def xavier_init(gpu, *size):
-    return nn.init.xavier_normal(variable(torch.FloatTensor(*size), gpu))
+    return nn.init.xavier_normal_(variable(torch.FloatTensor(*size), gpu))
 
 
 def init_varaible_zero(gpu, *size):
@@ -71,7 +71,7 @@ def log_sum_exp(vec, m_size):
 
 def encode2char_safe(input_lines, char_dict):
 
-    unk = char_dict['<u>']
+    unk = char_dict['<unk>']
     forw_lines = [list(map(lambda m: list(map(lambda t: char_dict.get(t, unk), m)), line)) for line in input_lines]
     return forw_lines
 
@@ -412,11 +412,11 @@ def adjust_learning_rate(optimizer, lr):
 def init_embedding(input_embedding):
 
     bias = np.sqrt(3.0 / input_embedding.size(1))
-    nn.init.uniform(input_embedding, -bias, bias)
+    nn.init.uniform_(input_embedding, -bias, bias)
 
 def init_linear(input_linear):
 
-    nn.init.orthogonal(input_linear.weight)
+    nn.init.orthogonal_(input_linear.weight)
     if input_linear.bias is not None:
         input_linear.bias.data.zero_()
 
@@ -424,9 +424,9 @@ def init_lstm(input_lstm):
 
     for ind in range(0, input_lstm.num_layers):
         weight = eval('input_lstm.weight_ih_l'+str(ind))
-        nn.init.orthogonal(weight)
+        nn.init.orthogonal_(weight)
         weight = eval('input_lstm.weight_hh_l'+str(ind))
-        nn.init.orthogonal(weight)
+        nn.init.orthogonal_(weight)
     
     if input_lstm.bias:
         for ind in range(0, input_lstm.num_layers):
@@ -442,10 +442,10 @@ def init_lstm_cell(input_lstm):
 
     weight = eval('input_lstm.weight_ih')
     bias = np.sqrt(6.0 / (weight.size(0) / 4 + weight.size(1)))
-    nn.init.uniform(weight, -bias, bias)
+    nn.init.uniform_(weight, -bias, bias)
     weight = eval('input_lstm.weight_hh')
     bias = np.sqrt(6.0 / (weight.size(0) / 4 + weight.size(1)))
-    nn.init.uniform(weight, -bias, bias)
+    nn.init.uniform_(weight, -bias, bias)
 
     if input_lstm.bias:
         weight = eval('input_lstm.bias_ih' )

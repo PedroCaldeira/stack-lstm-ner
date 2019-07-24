@@ -125,12 +125,12 @@ class TransitionNER(nn.Module):
                 utils.variable(torch.LongTensor(batch_valid_actions[have_action_batch[idx]]), self.gpu_triger)]
             valid_action_tbl = {a: i for i, a in enumerate(batch_valid_actions[have_action_batch[idx]])}
             log_probs = torch.nn.functional.log_softmax(logit)
-            action_idx = torch.max(log_probs.cpu(), 0)[1][0].data.numpy()[0]
+            action_idx = torch.max(log_probs.cpu(), 0)[1].item()
             action_predict = batch_valid_actions[have_action_batch[idx]][action_idx]
             predict_actions.append(action_predict)
             if self.mode == 'train':
                 if log_probs is not None:
-                    losses.append(log_probs[valid_action_tbl[batch_real_actions[have_action_batch[idx]]]])
+                    losses.append(log_probs[valid_action_tbl[batch_real_actions[have_action_batch[idx]].item()]])
 
         if self.mode == 'predict':
             losses = None
@@ -346,7 +346,7 @@ class TransitionNER(nn.Module):
                     batch_pred, batch_loss = self.getloss_batch(have_action_batch, batch_buffer, batch_stack,
                                                                 batch_action, batch_output, batch_valid_actions,
                                                                 batch_real_action)
-                    batch_real_action = [self.idx2action[ac] for ac in batch_real_action]
+                    batch_real_action = [self.idx2action[ac.item()] for ac in batch_real_action]
                 elif self.mode == 'predict':
                     batch_pred, batch_loss = self.getloss_batch(have_action_batch, batch_buffer, batch_stack,
                                                                 batch_action, batch_output, batch_valid_actions)

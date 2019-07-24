@@ -237,7 +237,7 @@ class TransitionNER(nn.Module):
         for i in range(token_embedding.size()[0]):
             tok_embed = token_embedding[token_embedding.size()[0]-1-i].unsqueeze(0)
             tok = sentence.data[token_embedding.size()[0]-1-i]
-            buffer.push(tok_embed, (tok_embed, self.idx2word[tok]))
+            buffer.push(tok_embed, (tok_embed, self.idx2word[tok.item()]))
 
         while len(buffer) > 0 or len(stack) > 0:
             valid_actions = self.get_possible_actions(stack, buffer)
@@ -252,15 +252,15 @@ class TransitionNER(nn.Module):
                     logits = self.output_2_act(hidden_output)[0][torch.autograd.Variable(torch.LongTensor(valid_actions))]
                 valid_action_tbl = {a: i for i, a in enumerate(valid_actions)}
                 log_probs = torch.nn.functional.log_softmax(logits, dim=0)
-                action_idx = torch.max(log_probs.cpu(), 0)[1][0].data.numpy()[0]
+                action_idx = torch.max(log_probs.cpu(), 0)[1].item()
                 action_predict = valid_actions[action_idx]
                 pre_actions.append(action_predict)
                 if mode == 'train':
                     if log_probs is not None:
-                        losses.append(log_probs[valid_action_tbl[actions.data[action_count]]])
+                        losses.append(log_probs[valid_action_tbl[actions.data[action_count].item()]])
 
             if mode == 'train':
-                real_action = self.idx2action[actions.data[action_count]]
+                real_action = self.idx2action[actions.data[action_count].item()]
                 act_embedding = action_embeds[action_count].unsqueeze(0)
                 rel_embedding = relation_embeds[action_count].unsqueeze(0)
             elif mode == 'predict':
